@@ -33,6 +33,7 @@ void generarTablero(int matriz[][15],int status);
 void aumentarPuntosAciertos(int cont);
 void cronometroBuscaminas(int status);
 void juegoBuscaminas();
+void juegoGato();
 void puntajesJugadores();
 void solicitarNombreBuscaminas();
 void asignarPuntaje(int puntosJugador);
@@ -492,6 +493,217 @@ void juegoBuscaminas(){
 		}while((decision != 1) || (decision != 0));
 		system("cls");	
 	}while(repetir);
+}
+
+void juegoGato(){
+	//Declaracion de Variables	
+	int jugador=1;
+	int error;
+	int empate=0;
+	int ganar=0;
+	
+	char c1='1',c2='2', c3='3', c4='4', c5='5', c6='6', c7='7', c8='8', c9='9';
+	char tiro, marca, respuesta='y';
+	
+	//Declaracion de las dimensiones
+	int c=22, f=78; 
+	do{
+		//Limpia la Pantalla
+		system("cls");
+		
+		//Generación de bordes del cuadro de la interfaz
+		for(int i=0 ; i<f ; i++){
+			gotoxy(i,0);
+			printf("%c",178);
+			gotoxy(i,c);
+			printf("%c",178);
+		}
+		
+		//Generación de bordes del cuadro de la interfaz
+		for(int i=0 ; i<=c ; i++){
+			gotoxy(0,i);
+			printf("%c",178);
+			gotoxy(f,i);
+			printf("%c",178);
+		}
+		
+		//Cambio de color de texto de la consola
+		system("color 0a");
+		error=1;
+		
+		//Impresion de Tablero
+		gotoxy(5,1);
+		printf("\t\t\t  ***JUEGO DE GATO***\n\n");
+		printf("\n\t\t\t     %c | %c | %c\n", c1, c2, c3);
+		printf("\t\t\t    ---+---+---\n");
+		printf("\n\t\t\t     %c | %c | %c\n", c4, c5, c6);
+		printf("\t\t\t    ---+---+---\n");
+		printf("\n\t\t\t     %c | %c | %c\n\n\n", c7, c8, c9);
+
+		//Asignacon de Marca Para Cada Jugador
+		if(jugador==1){
+			marca='X';
+		}else{
+			marca='O';
+		}
+		
+		//Muestra el turno del Jugador Actual
+		printf("\tTurno del Jugador %d:  ", jugador);
+		
+		fflush(stdin);
+		
+		do{
+			scanf("%c",&tiro);
+			fflush(stdin);
+		}while(tiro>'9' || tiro<'1');
+		
+		//Condicionales Para Cambiar el Numero Puesto Por la Ficha del Jugador Actual
+		if (tiro=='1' && c1=='1'){c1=marca;}
+		else if (tiro=='2' && c2=='2') {c2=marca;}
+		else if (tiro=='3' && c3=='3') {c3=marca;}
+		else if (tiro=='4' && c4=='4') {c4=marca;}
+		else if (tiro=='5' && c5=='5') {c5=marca;}
+		else if (tiro=='6' && c6=='6') {c6=marca;}
+		else if (tiro=='7' && c7=='7') {c7=marca;}
+		else if (tiro=='8' && c8=='8') {c8=marca;}
+		else if (tiro=='9' && c9=='9') {c9=marca;}
+		else{
+			printf("\n\tError! Movimiento No Valido\n");
+			Sleep(400); 
+			error=2;
+		}
+		
+		//Condicionales para Detectar 3 Marcas Iguales en Fila y Ganar el Juego
+		if(c1=='X'||c1=='O'){
+			if(c2==c1&&c3==c1){
+				ganar=1;
+			}
+			if(c4==c1&&c7==c1){
+				ganar=1;
+			}
+		}
+		
+		//Condicionales para Detectar 3 Marcas Iguales en Diagonal y Ganar el Juego
+		if(c5=='X'||c5=='O'){
+			if(c1==c5 && c9==c5){
+				ganar=1;
+			}
+			if(c2==c5 && c8==c5){
+				ganar=1;
+			}
+			if(c4==c5 && c6==c5){
+				ganar=1;
+			}
+			if(c3==c5 && c7==c5){
+				ganar=1;
+			}
+		}
+		
+		//Condicionales para Detectar 3 Marcas Iguales en Columna y Ganar el Juego
+		if(c9=='X'||c9=='O'){
+			if(c6==c9 && c3==c9){
+				ganar=1;
+			}
+			if(c7==c9 && c8==c9){
+				ganar=1;
+			}
+		}
+		
+		//Condicionales Para Detectar Si Hay Empate
+		if((c1!='1' && c2!='2' && c3!='3' && c4!='4' && c5!='5' && c6!='6' && c7!='7' && c8!='8' && c9!='9') && ganar==0){
+			empate=1;
+		}
+		
+		if(ganar==1 || empate==1){
+			//Limpieza de Pantalla y Muestra de Resultado Final
+			system("cls"); 
+			if(ganar==1){
+				//Generación de los bordes del cuadro de la interfaz
+				for(int i=0 ; i<f ; i++){ 
+					gotoxy(i,0);
+					printf("%c",178);
+					gotoxy(i,c);
+					printf("%c",178);
+				}
+				
+				//Generación de los bordes del Cuadro de la Interfaz
+				for(int i=0 ; i<=c ; i++){ 
+					gotoxy(0,i);
+					printf("%c",178);
+					gotoxy(f,i);
+					printf("%c",178);
+				}
+				
+				gotoxy(5,2);
+				printf("\t\t\t¡JUGADOR: %d HA GANADO!\n\n",jugador);
+				printf("\n\t\t\t      %c | %c | %c\n", c1, c2, c3);
+				printf("\t\t\t     ---+---+---\n");
+				printf("\n\t\t\t      %c | %c | %c\n", c4, c5, c6);
+				printf("\t\t\t     ---+---+---\n");
+				printf("\n\t\t\t      %c | %c | %c\n\n", c7, c8, c9);
+			}
+			
+			//Generación de bordes del cuadro de la interfaz
+			if(empate==1){
+				for(int i=0 ; i<f ; i++){
+					gotoxy(i, 0);
+					printf("%c", 178);
+					gotoxy(i,c);
+					printf("%c", 178);
+				}
+				
+				//Generación de bordes del cuadro de la interfaz
+				for(int i=0 ; i<=c ; i++){
+					gotoxy(0, i);
+					printf("%c", 178);
+					gotoxy(f, i);
+					printf("%c", 178);
+				}
+				
+				gotoxy(5,1);
+				printf("\t\t\t    ¡¡EMPATE!! \n");
+				printf("\n\t\t\t     %c | %c | %c\n",c1,c2,c3);
+				printf("\t\t\t    ---+---+---\n");
+				printf("\n\t\t\t     %c | %c | %c\n",c4,c5,c6);
+				printf("\t\t\t    ---+---+---\n");
+				printf("\n\t\t\t     %c | %c | %c\n\n\n",c7,c8,c9);
+			}
+			
+			gotoxy(3, 15);printf("¿Desea Jugar de Nuevo?: Si.(Oprima 'y')    No. (Cualquier Otra Tecla)  ");
+			
+			//Limpieza del Buffer de los Datos Almacenados
+			fflush(stdin);
+			
+			gotoxy(75, 15);
+			scanf("%c", &respuesta);
+			
+			//Condicional para el caso si se quiere volver a jugar, reimpresión del tablero y reinicio de contadores
+			if (respuesta=='y' || respuesta=='Y'){
+				empate=0;
+				jugador=2;
+				ganar=0;
+				c1='1';
+				c2='2';
+				c3='3';
+				c4='4';
+				c5='5';
+				c6='6';
+				c7='7';
+				c8='8';
+				c9='9';
+			}
+		}
+		//Condicional para cambio de turno
+		if(error==1){
+			if(jugador==1){
+				jugador=2;
+			}else{
+				jugador=1;
+			}
+		}	
+
+	//Ciclo para repetir el juego hasta que se desee salir
+	}while(respuesta=='y' || respuesta=='Y');
 }
 
 //Funcion que despliega los puntajes de los jugadores registrados
