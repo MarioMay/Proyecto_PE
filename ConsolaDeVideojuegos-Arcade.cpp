@@ -283,6 +283,7 @@ void menuJuegos(){
 		case 1:
 			//Juego de Gato
 			system("cls");
+			juegoGato();
 			break;
 		case 2:
 			//Buscaminas
