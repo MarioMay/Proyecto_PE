@@ -7,16 +7,16 @@
 #include <stdlib.h> //Biblioteca estandar de proposito general
 #include <stdbool.h>
 
+//Definimos las macros a utilizar
 #define ARRIBA 72
 #define IZQUIERDA 75
 #define DERECHA 77
 #define ABAJO 80
 #define ESC 27
-using namespace std;
-
-//Definimos las macros a utilizar
 #define fila 15
 #define columna 15
+
+using namespace std;
 
 //Definimos la estructura del Jugador
 typedef struct player{
@@ -26,6 +26,7 @@ typedef struct player{
 player Jugador;
 
 //Inicializamos las funciones
+//Funciones generales
 void gotoxy(int x, int y);
 void bordesSistema();
 void tituloPrincipal();
@@ -33,6 +34,9 @@ void menuPrincipal();
 void instrucciones();
 void creditos();
 void menuJuegos();
+void puntajesJugadores();
+void asignarPuntaje(int puntosJugador);
+//Funciones del Buscaminas
 void llenarMatriz(int matriz[][15]);
 void tituloBuscaminas();
 int generarBombas(int x);
@@ -41,19 +45,17 @@ void generarTablero(int matriz[][15],int status);
 void aumentarPuntosAciertos(int cont);
 void cronometroBuscaminas(int status);
 void juegoBuscaminas();
-void juegoGato();
-void puntajesJugadores();
 void solicitarNombreBuscaminas();
-void asignarPuntaje(int puntosJugador);
 void guardarRegistroBuscaminas(player Jugador);
 void consultarRegistroBuscaminas();
+//Funcion del Gato
+void juegoGato();
+//Funciones del Ahorcado
 void juegoAhorcado();
 void dibujoAhorcado();
 void dibujoAhorcado2();
 void titulo_principal_ahorcado();
-
-//PROTOTIPOS DE LAS FUNCIONES DEL SNAKE	
-
+//Funciones del Snake	
 void ocultarCursor();
 void cuadro();
 void guardar_posicion();
@@ -67,7 +69,6 @@ void solicitarNombreSnake();
 void guardarRegistroSnake(player Jugador);
 void consultarRegistroSnake();
 void asignarPuntajeSnake();
-
 
 //DECLARACION GLOBAL DE VARIABLES
 int cuerpo[200][2];
@@ -537,40 +538,19 @@ void juegoBuscaminas(){
 }
 
 void juegoGato(){
-	//Declaracion de Variables	
-	int jugador=1;
-	int error;
-	int empate=0;
-	int ganar=0;
-	
-	char c1='1',c2='2', c3='3', c4='4', c5='5', c6='6', c7='7', c8='8', c9='9';
-	char tiro, marca, respuesta='y';
-	
-	//Declaracion de las dimensiones
-	int c=22, f=78; 
+	//Declaracion de variables	
+	int jugador = 1, empate = 0, ganar = 0, error;
+	char c1 = '1', c2 = '2', c3 = '3', c4 = '4', c5 = '5', c6 = '6', c7 = '7', c8 = '8', c9 = '9';
+	char tiro, marca, respuesta = 'y';
+
 	do{
 		//Limpia la Pantalla
 		system("cls");
-		
-		//Generación de bordes del cuadro de la interfaz
-		for(int i=0 ; i<f ; i++){
-			gotoxy(i,0);
-			printf("%c",178);
-			gotoxy(i,c);
-			printf("%c",178);
-		}
-		
-		//Generación de bordes del cuadro de la interfaz
-		for(int i=0 ; i<=c ; i++){
-			gotoxy(0,i);
-			printf("%c",178);
-			gotoxy(f,i);
-			printf("%c",178);
-		}
-		
+		//Llamamos a la funcion que genera los bordes
+		bordesSistema();
 		//Cambio de color de texto de la consola
 		system("color 0a");
-		error=1;
+		error = 1;
 		
 		//Impresion de Tablero
 		gotoxy(5,1);
@@ -582,99 +562,84 @@ void juegoGato(){
 		printf("\n\t\t\t     %c | %c | %c\n\n\n", c7, c8, c9);
 
 		//Asignacon de Marca Para Cada Jugador
-		if(jugador==1){
-			marca='X';
+		if(jugador == 1){
+			marca = 'X';
 		}else{
-			marca='O';
+			marca = 'O';
 		}
 		
 		//Muestra el turno del Jugador Actual
 		printf("\tTurno del Jugador %d:  ", jugador);
-		
 		fflush(stdin);
 		
 		do{
 			scanf("%c",&tiro);
 			fflush(stdin);
-		}while(tiro>'9' || tiro<'1');
+		}while((tiro > '9') || (tiro < '1'));
 		
 		//Condicionales Para Cambiar el Numero Puesto Por la Ficha del Jugador Actual
-		if (tiro=='1' && c1=='1'){c1=marca;}
-		else if (tiro=='2' && c2=='2') {c2=marca;}
-		else if (tiro=='3' && c3=='3') {c3=marca;}
-		else if (tiro=='4' && c4=='4') {c4=marca;}
-		else if (tiro=='5' && c5=='5') {c5=marca;}
-		else if (tiro=='6' && c6=='6') {c6=marca;}
-		else if (tiro=='7' && c7=='7') {c7=marca;}
-		else if (tiro=='8' && c8=='8') {c8=marca;}
-		else if (tiro=='9' && c9=='9') {c9=marca;}
+		if(tiro == '1' && c1 == '1'){c1 = marca;}
+		else if(tiro == '2' && c2 == '2') {c2 = marca;}
+		else if(tiro=='3' && c3 == '3') {c3 = marca;}
+		else if(tiro=='4' && c4 == '4') {c4 = marca;}
+		else if(tiro=='5' && c5 == '5') {c5 = marca;}
+		else if(tiro=='6' && c6 == '6') {c6 = marca;}
+		else if(tiro=='7' && c7 == '7') {c7 =marca;}
+		else if(tiro=='8' && c8 == '8') {c8 = marca;}
+		else if(tiro=='9' && c9 == '9') {c9 = marca;}
 		else{
 			printf("\n\tError! Movimiento No Valido\n");
 			Sleep(400); 
-			error=2;
+			error = 2;
 		}
 		
 		//Condicionales para Detectar 3 Marcas Iguales en Fila y Ganar el Juego
-		if(c1=='X'||c1=='O'){
-			if(c2==c1&&c3==c1){
+		if((c1 == 'X') || (c1 == 'O')){
+			if((c2 == c1) && (c3 == c1)){
 				ganar=1;
 			}
-			if(c4==c1&&c7==c1){
-				ganar=1;
+			if((c4 == c1) && (c7 == c1)){
+				ganar = 1;
 			}
 		}
 		
 		//Condicionales para Detectar 3 Marcas Iguales en Diagonal y Ganar el Juego
-		if(c5=='X'||c5=='O'){
-			if(c1==c5 && c9==c5){
-				ganar=1;
+		if((c5 == 'X') || (c5 == 'O')){
+			if((c1 == c5) && (c9 == c5)){
+				ganar = 1;
 			}
-			if(c2==c5 && c8==c5){
-				ganar=1;
+			if((c2 == c5) && (c8 == c5)){
+				ganar = 1;
 			}
-			if(c4==c5 && c6==c5){
-				ganar=1;
+			if((c4 == c5) && (c6 == c5)){
+				ganar = 1;
 			}
-			if(c3==c5 && c7==c5){
-				ganar=1;
+			if((c3 == c5) && (c7 == c5)){
+				ganar = 1;
 			}
 		}
 		
 		//Condicionales para Detectar 3 Marcas Iguales en Columna y Ganar el Juego
-		if(c9=='X'||c9=='O'){
-			if(c6==c9 && c3==c9){
-				ganar=1;
+		if((c9 == 'X') || (c9 == 'O')){
+			if((c6 == c9) && (c3 == c9)){
+				ganar = 1;
 			}
-			if(c7==c9 && c8==c9){
-				ganar=1;
+			if((c7 == c9) && (c8 == c9)){
+				ganar = 1;
 			}
 		}
 		
 		//Condicionales Para Detectar Si Hay Empate
 		if((c1!='1' && c2!='2' && c3!='3' && c4!='4' && c5!='5' && c6!='6' && c7!='7' && c8!='8' && c9!='9') && ganar==0){
-			empate=1;
+			empate = 1;
 		}
 		
-		if(ganar==1 || empate==1){
+		if((ganar == 1) || (empate == 1)){
 			//Limpieza de Pantalla y Muestra de Resultado Final
 			system("cls"); 
-			if(ganar==1){
-				//Generación de los bordes del cuadro de la interfaz
-				for(int i=0 ; i<f ; i++){ 
-					gotoxy(i,0);
-					printf("%c",178);
-					gotoxy(i,c);
-					printf("%c",178);
-				}
-				
-				//Generación de los bordes del Cuadro de la Interfaz
-				for(int i=0 ; i<=c ; i++){ 
-					gotoxy(0,i);
-					printf("%c",178);
-					gotoxy(f,i);
-					printf("%c",178);
-				}
-				
+			if(ganar == 1){
+				//Llamamos a la funcion que genera los bordes
+				bordesSistema();
 				gotoxy(5,2);
 				printf("\t\t\t¡JUGADOR: %d HA GANADO!\n\n",jugador);
 				printf("\n\t\t\t      %c | %c | %c\n", c1, c2, c3);
@@ -685,22 +650,9 @@ void juegoGato(){
 			}
 			
 			//Generación de bordes del cuadro de la interfaz
-			if(empate==1){
-				for(int i=0 ; i<f ; i++){
-					gotoxy(i, 0);
-					printf("%c", 178);
-					gotoxy(i,c);
-					printf("%c", 178);
-				}
-				
-				//Generación de bordes del cuadro de la interfaz
-				for(int i=0 ; i<=c ; i++){
-					gotoxy(0, i);
-					printf("%c", 178);
-					gotoxy(f, i);
-					printf("%c", 178);
-				}
-				
+			if(empate == 1){
+				//Llamamos a la funcion que genera los bordes
+				bordesSistema();
 				gotoxy(5,1);
 				printf("\t\t\t    ¡¡EMPATE!! \n");
 				printf("\n\t\t\t     %c | %c | %c\n",c1,c2,c3);
@@ -709,13 +661,10 @@ void juegoGato(){
 				printf("\t\t\t    ---+---+---\n");
 				printf("\n\t\t\t     %c | %c | %c\n\n\n",c7,c8,c9);
 			}
-			
-			gotoxy(3, 15);printf("¿Desea Jugar de Nuevo?: Si.(Oprima 'y')    No. (Cualquier Otra Tecla)  ");
-			
+			gotoxy(3,15);printf("¿Desea Jugar de Nuevo?: Si.(Oprima 'y')    No. (Cualquier Otra Tecla)  ");
 			//Limpieza del Buffer de los Datos Almacenados
 			fflush(stdin);
-			
-			gotoxy(75, 15);
+			gotoxy(75,15);
 			scanf("%c", &respuesta);
 			
 			//Condicional para el caso si se quiere volver a jugar, reimpresión del tablero y reinicio de contadores
@@ -742,7 +691,6 @@ void juegoGato(){
 				jugador=1;
 			}
 		}	
-
 	//Ciclo para repetir el juego hasta que se desee salir
 	}while(respuesta=='y' || respuesta=='Y');
 }
@@ -837,73 +785,63 @@ void consultarRegistroBuscaminas(){
 	}
 }
 
-//INICIO DE LA SECCION DEL SNAKE//
 //FUNCION SUBPRINCIPAL MAIN DEL SNAKE
 void mainSnake(){
 	system("mode con cols=80 lines=25");
- 	gotoxy (35,1); printf("JUEGO SNAKE");
+ 	gotoxy(35,1);printf("JUEGO SNAKE");
  	printf("\n\n");
 	ocultarCursor();
  	cuadro();
  	gotoxy(xc, yc); printf("%c", 4);
  
- 	while(tecla != ESC && perder()){
- 		gotoxy (3,2); printf("PUNTUACION: %i",puntos);
+ 	while((tecla != ESC) && perder()){
+ 		gotoxy(3,2);printf("PUNTUACION: %i", puntos);
 		borrar_cuerpo();
 		guardar_posicion();
 		dibujar_cuerpo();
 		comida();
 		teclear();
 		teclear();
- 
 		if(dir == 1) y--;
 		if(dir == 2) y++;
 		if(dir == 3) x++;
 		if(dir == 4) x--;
- 
 		Sleep(velocidad);
  	}
- 	
+	
  	system("cls");
- 	gotoxy (35,1); printf("JUEGO SNAKE");
+ 	gotoxy(35,1);printf("JUEGO SNAKE");
  	cuadro();
- 	gotoxy (22,12); printf("OBTUVISTE UNA PUNTUACION DE: %i",puntos);
- 	gotoxy (22,14); printf("Presione una tecla para continuar..");
+ 	gotoxy(22,12);printf("OBTUVISTE UNA PUNTUACION DE: %i", puntos);
+ 	gotoxy(22,14);printf("Presione una tecla para continuar..");
  	solicitarNombreSnake();
  	guardarRegistroSnake(Jugador);
  	menuJuegos();
  	getch();
-	
 }
-
 
 //FUNCION QUE REALIZA EL RECUADRO DEL JUEGO SNAKE
 void cuadro(){ 
 	int i,v;
-	
-	for(i=2; i < 78; i++){
-		gotoxy (i, 4); printf ("%c", 205);
- 		gotoxy(i, 23); printf ("%c", 205); 
+	for(i = 2; i < 78; i++){
+		gotoxy(i,4);printf("%c",205);
+ 		gotoxy(i,23);printf("%c",205); 
 	}
-
-	for(v=4; v < 23; v++){
- 		gotoxy (2,v); printf ("%c", 186);
- 		gotoxy(77,v); printf ("%c", 186); 
+	for(v = 4; v < 23; v++){
+ 		gotoxy(2,v);printf("%c",186);
+ 		gotoxy(77,v);printf("%c",186); 
 	}
-	
- 	gotoxy (2,4); printf ("%c", 201);
- 	gotoxy (2,23); printf ("%c", 200);
- 	gotoxy (77,4); printf ("%c", 187);
- 	gotoxy(77,23); printf ("%c", 188); 
+ 	gotoxy(2,4);printf("%c",201);
+ 	gotoxy(2,23);printf("%c",200);
+ 	gotoxy(77,4);printf("%c",187);
+ 	gotoxy(77,23);printf("%c",188); 
 }
-
  
 //FUNCION QUE GUARDA LA POSICION EN LA QUE SE ENCUENTRA LA SERPIENTE
 void guardar_posicion(){
 	cuerpo[n][0] = x;
  	cuerpo[n][1] = y;
  	n++;
- 
  	if(n == tam) n = 1;
 }
 
@@ -911,16 +849,15 @@ void guardar_posicion(){
 void dibujar_cuerpo(){
 	int i;
 	for(i = 1; i < tam; i++){
- 		gotoxy(cuerpo[i][0] , cuerpo[i][1]); printf("*");
+ 		gotoxy(cuerpo[i][0],cuerpo[i][1]);printf("*");
 	}
 }
 
 //FUNCION QUE BORRA EL CUERPO DE LA SERPIENTE (SE BORRA LA ULTIMA PARTE DEL CUERPO)
 void borrar_cuerpo(){
-	gotoxy(cuerpo[n][0] , cuerpo[n][1]); printf(" ");
+	gotoxy(cuerpo[n][0],cuerpo[n][1]);printf(" ");
 }
  
-
 //FUNCION QUE DETECTA QUE TECLA SE ESTA PRESIONANDO
 void teclear(){
 	if(kbhit()){
@@ -937,27 +874,25 @@ void teclear(){
 
 //FUNCION QUE MUESTRA LA COMIDA DE FORMA ALEATORIA EN ALGUNA ZONA DE LA PANTALLA 
 void comida(){
-	if(x == xc && y == yc){
+	if((x == xc) && (y == yc)){
 		xc = (rand() % 73) + 4;
  		yc = (rand() % 18) + 5;
  		tam++;
- 		puntos+=100;
- 		gotoxy(xc, yc); printf("%c", 4);
+ 		puntos += 100;
+ 		gotoxy(xc,yc);printf("%c", 4);
 	}
 }
 
 //FUNCION QUE VERIFICA SI SE TOPADO EL RECUADRO O SE HA CHOCADO CON EL MISMO CUERPO
 bool perder(){
 	int j;
-	
-	if(y == 4 || y == 23 || x == 2 || x == 77) 
+	if((y == 4) || (y == 23) || (x == 2) || (x == 77)) 
 		return false;
 		
  	for(j = tam - 1; j > 0; j--){
 	 	if(cuerpo[j][0] == x && cuerpo[j][1] == y)
 	 	return false;
 	}
-	
 	return true;
 }
 
@@ -966,20 +901,17 @@ void solicitarNombreSnake(){
 	fflush(stdin);
 	gotoxy(46,10);printf("Inserte Su Nickname:");
 	gotoxy(66,10);gets(Jugador.nombre);
-
-
-
 }
 
 //Funcion que guarda el registo de snake en un archivo txt
 void guardarRegistroSnake(player Jugador){
 	FILE *f;
-	f = fopen("RegistroSnake.txt","a+");
+	f = fopen("RegistroSnake.txt", "a+");
 	if(f == NULL){
 		printf("No se pudo abrir el archivo.\n");
 	}else{
 		gotoxy(3,5);fprintf(f, "\n\t\t\t\t%s.........", Jugador.nombre); 
-		gotoxy(17,5);fprintf (f,"%d", Jugador.puntos);
+		gotoxy(17,5);fprintf (f, "%d", Jugador.puntos);
 	}
 	fclose(f);
 }
@@ -1006,16 +938,12 @@ void asignarPuntajeSnake(int puntosJugador){
 	Jugador.puntos = puntos;
 }
 
-
 //FUNCION QUE OCULTA EL CURSOR
-void ocultarCursor() {
+void ocultarCursor(){
 	CONSOLE_CURSOR_INFO cci = {100, FALSE};
 	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cci);
 }
 
-//HASTA AQUI TERMINA LA SECCION DEL SNAKE//
-
-//INICIO DE LAS FUNCIONES DE AHORCADO
 //FUNCIÓN PRINCIPAL DEL AHORCADO
 void juegoAhorcado(){
 	system("color 0b");
@@ -1032,29 +960,26 @@ void juegoAhorcado(){
 		fflush(stdin);
 		// preguntamos a el jugador la palabra que guste y contamos la cantidad de caracteres 
 		dibujoAhorcado();
-		gotoxy(24, 3);
-		printf("Jugador 1");
-		gotoxy(24, 5);
-		printf("Introduzca la palabra o frase:");
+		gotoxy(24, 3);printf("Jugador 1");
+		gotoxy(24, 5);printf("Introduzca la palabra o frase:");
 		gotoxy(28, 7);
 		fflush(stdin);
 		gets(palabra);
-		longitud = 0,inicial = 0,j = 0;
-		
+		longitud = 0, inicial = 0, j = 0;
 		rep[0] = ' ';
 		rep[1] = '\0';
 		
-		
-		do {
+		do{
 			fflush(stdin);
 			system("cls");
+			//Llamamos a la funcion que imprime el dibujo del ahorcado
 			dibujoAhorcado();
 			temp = 0;
 			// aqui leemos cuantos caracteres va a tener la palabra, y ponemos un espaco en blanco
-			if(inicial == 0) {
+			if(inicial == 0){
 				i1=strlen(palabra);
-				for(i = 0; i < i1; i++) {
-					if(palabra[i] == ' ') {
+				for(i = 0; i < i1; i++){
+					if(palabra[i] == ' '){
 						temporal[i] = ' ';
 						longitud++;
 					}
@@ -1066,23 +991,22 @@ void juegoAhorcado(){
 			}
 			//cambiamos el valor inicial para seguir corriendo el programa
 			inicial = 1;
-			
 			temporal[longitud] = '\0';
 			//verificamos si la letra esta repetida o escribimos la letra
-			i2=strlen(rep);
-			for(i = 0; i < i2; i++) {
-				if(rep[i] == pal) {
+			i2 = strlen(rep);
+			for(i = 0; i < i2; i++){
+				if(rep[i] == pal){
 					repetido = 1;
 					break;
 				}
-				else {
+				else{
 					repetido = 0;
 				}
 			}
 			// si no esta repetida la letra la imprimimos en temporal y aumentamos el contador de bien
-			if(repetido == 0) {
-				for(i = 0;i < i1; i++) {
-					if(palabra[i] == pal) {
+			if(repetido == 0){
+				for(i = 0; i < i1; i++){
+					if(palabra[i] == pal){
 						temporal[i] = pal;
 						bien++;
 						puntos += 10;
@@ -1091,13 +1015,13 @@ void juegoAhorcado(){
 				}
 			}
 			// si n se escribio nada mas se quita una de las oportunidades
-			if(repetido == 0) {
+			if(repetido == 0){
 				puntos -= 2;
-				if(temp == 0) {
+				if(temp == 0){
 					oportunidades -= 1;
 				}
 			}
-			else {
+			else{
 				printf("Ya se ha introducido este caracter");
 				printf("\n\n");
 			}
@@ -1105,54 +1029,40 @@ void juegoAhorcado(){
 			// imprimimos la letra
 			gotoxy(35, 6);
 			i3=strlen(temporal);
-			for(i = 0; i< i3; i++) {
-				printf(" %c ",temporal[i]);
+			for(i = 0; i < i3; i++) {
+				printf(" %c ", temporal[i]);
 			}
-			
 			printf("\n");
 			//verificamos si gana
-			if(strcmp (palabra, temporal) == 0) {
+			if(strcmp(palabra,temporal) == 0){
 				victoria = 1;
 				break;
 			}
-			gotoxy(45, 1);
-			printf("Letras Bien: %d", bien);
-			gotoxy(63, 1);
-			printf("Puntaje: %d", puntos+2);
+			gotoxy(45,1);printf("Letras Bien: %d", bien);
+			gotoxy(63,1);printf("Puntaje: %d", puntos + 2);
 			//Barra de Vida
-			gotoxy(23, 1);
-			printf("Vidas Restantes: %d", oportunidades);
+			gotoxy(23,1);printf("Vidas Restantes: %d", oportunidades);
 			rep[j] = pal;
 			j++;
 			//verificamos si pierde
-			if (oportunidades == 0)
-			{
+			if(oportunidades == 0){
 				break;
 			}
-			gotoxy(32, 4);
-			printf("Jugador 2 Introduzca una letra:");
+			gotoxy(32,4);printf("Jugador 2 Introduzca una letra:");
 			scanf("\n%c", &pal);
 			
 		}while(oportunidades != 0);
 		
 		if(victoria == 1) {
 			system("cls");
-			gotoxy(2,6);
-			printf("Y88b   d88P                     888       888 d8b \n");  
-			gotoxy(2,7);
-			printf(" Y88b d88P                      888   o   888 Y8P \n");  
-			gotoxy(2,8);
-			printf("  Y88o88P                       888  d8b  888           \n"); 
-			gotoxy(2,9);
-			printf("   Y888P  .d88b.  888  888      888 d888b 888 888 88888b.\n");
-			gotoxy(2,10);
-			printf("    888  d88''88b 888  888      888d88888b888 888 888 '88b\n");
-			gotoxy(2,11);
-			printf("    888  888  888 888  888      88888P Y88888 888 888  888 \n");
-			gotoxy(2,12);
-			printf("    888  Y88..88P Y88b 888      8888P   Y8888 888 888  888 \n");
-			gotoxy(2,13);
-			printf("    888   'Y88P'   'Y88888      888P     Y888 888 888  888 \n");
+			gotoxy(2,6);printf("Y88b   d88P                     888       888 d8b \n");  
+			gotoxy(2,7);printf(" Y88b d88P                      888   o   888 Y8P \n");  
+			gotoxy(2,8);printf("  Y88o88P                       888  d8b  888           \n"); 
+			gotoxy(2,9);printf("   Y888P  .d88b.  888  888      888 d888b 888 888 88888b.\n");
+			gotoxy(2,10);printf("    888  d88''88b 888  888      888d88888b888 888 888 '88b\n");
+			gotoxy(2,11);printf("    888  888  888 888  888      88888P Y88888 888 888  888 \n");
+			gotoxy(2,12);printf("    888  Y88..88P Y88b 888      8888P   Y8888 888 888  888 \n");
+			gotoxy(2,13);printf("    888   'Y88P'   'Y88888      888P     Y888 888 888  888 \n");
 			gotoxy(28,17);
 			gotoxy(28,17);printf("¿Desea Jugar de Nuevo?: 1 - Si    0 - No \n");
 			fflush(stdin);//Limpia el Buffer de los Datos Almacenados
@@ -1185,29 +1095,21 @@ void juegoAhorcado(){
 		else {
 			dibujoAhorcado2();
 			system("cls");
-			gotoxy(2,6);
-			printf("Y88b   d88P  .d88888b.  888     888      888      .d88888b.   .d8888b.  8888888888 \n");  
-			gotoxy(2,7);
-			printf(" Y88b d88P  d88P' 'Y88b 888     888      888     d88P' 'Y88b d88P  Y88b 888\n");  
-			gotoxy(2,8);
-			printf("  Y88o88P   888     888 888     888      888     888     888 Y88b.      888   \n"); 
-			gotoxy(2,9);
-			printf("   Y888P    888     888 888     888      888     888     888  'Y888b.   8888888\n");
-			gotoxy(2,10);
-			printf("    888     888     888 888     888      888     888     888     'Y88b. 888\n");
-			gotoxy(2,11);
-			printf("    888     888     888 888     888      888     888     888       '888 888        \n");
-			gotoxy(2,12);
-			printf("    888     Y88b. .d88P Y88b. .d88P      888     Y88b. .d88P Y88b  d88P 888 \n");
-			gotoxy(2,13);
-			printf("    888      'Y88888P'   'Y88888P'       88888888 'Y88888P'   'Y8888P'  8888888888\n");
+			gotoxy(2,6);printf("Y88b   d88P  .d88888b.  888     888      888      .d88888b.   .d8888b.  8888888888 \n");  
+			gotoxy(2,7);printf(" Y88b d88P  d88P' 'Y88b 888     888      888     d88P' 'Y88b d88P  Y88b 888\n");  
+			gotoxy(2,8);printf("  Y88o88P   888     888 888     888      888     888     888 Y88b.      888   \n"); 
+			gotoxy(2,9);printf("   Y888P    888     888 888     888      888     888     888  'Y888b.   8888888\n");
+			gotoxy(2,10);printf("    888     888     888 888     888      888     888     888     'Y88b. 888\n");
+			gotoxy(2,11);printf("    888     888     888 888     888      888     888     888       '888 888        \n");
+			gotoxy(2,12);printf("    888     Y88b. .d88P Y88b. .d88P      888     Y88b. .d88P Y88b  d88P 888 \n");
+			gotoxy(2,13);printf("    888      'Y88888P'   'Y88888P'       88888888 'Y88888P'   'Y8888P'  8888888888\n");
 			gotoxy(28,17);printf("¿Desea Jugar de Nuevo?: 1 - Si    0 - No \n");
 			fflush(stdin);//Limpia el Buffer de los Datos Almacenados
 			do{
-				scanf("%d",&answer);
+				scanf("%d", &answer);
 				fflush(stdin);
 				if(answer == 1){
-					repetir=1;
+					repetir = 1;
 					system("cls");
 					break;
 					puntos = 0;
@@ -1217,16 +1119,19 @@ void juegoAhorcado(){
 					i = 0;j = 0;
 					longitud = 0;
 					bien = 0;
-					temp = 0;i1 = 0;i2 = 0;i3 = 0;
+					temp = 0;
+					i1 = 0;
+					i2 = 0;
+					i3 = 0;
 				}
 				if(answer == 0){
 					repetir = 0;
 					menuJuegos();
 				}
-				if(answer != 1|| answer != 0){
+				if((answer != 1) || (answer != 0)){
 					puts("\n<<Caracter No Valido>>\n");
 				}
-			}while(answer != 1|| answer != 0);
+			}while((answer != 1) || (answer != 0));
 			system("cls");	
 		}
 	}while(repetir);//Se repite el juego hasta que el usuario desee salir
@@ -1235,53 +1140,41 @@ void juegoAhorcado(){
 void dibujoAhorcado(){
 	system("color 0f");
 	int c = 22, f = 20;//Declaracion de las dimensiones
-	
-	for(int i = 0 ; i < f ; i++){//Ancho de Borde
-		gotoxy(i,1);
-		printf("%c",176);
+	//Alto y ancho del borde
+	for(int i = 0 ; i < f ; i++){
+		gotoxy(i,1);printf("%c",176);
 	}
-	for(int i = 0 ; i <= c ; i++){//Alto de Borde
-		gotoxy(1, i);
-		printf("%c",176);
+	for(int i = 0 ; i <= c ; i++){
+		gotoxy(1, i);printf("%c",176);
 	}
-	for(int i = 2 ; i <= 5 ; i++){//Cuerda
-		gotoxy(16, i);
-		printf("%c\n", 186);
+	//Cuerda
+	for(int i = 2 ; i <= 5 ; i++){
+		gotoxy(16, i);printf("%c\n", 186);
 	}
-	gotoxy(6, 6);
-	printf("         ***             \n");
-	gotoxy(6, 7);
-	printf("        *****         \n");
-	gotoxy(6, 8);
-	printf("       *0***0*       \n");
-	gotoxy(6, 9);
-	printf("       *******     \n");
-	gotoxy(6, 10);
-	printf("        *****    \n");
-	gotoxy(6, 11);
-	printf("         ***             \n");
-	
-	for(int i=12 ; i<=17 ; i++){//Torso
-		gotoxy(16,i);
-		printf("*\n");
+	//Cabeza con vida
+	gotoxy(6,6);printf("         ***             \n");
+	gotoxy(6,7);printf("        *****         \n");
+	gotoxy(6,8);printf("       *0***0*       \n");
+	gotoxy(6,9);printf("       *******     \n");
+	gotoxy(6,10);printf("        *****    \n");
+	gotoxy(6,11);printf("         ***             \n");
+	//Torso
+	for(int i = 12 ; i <= 17 ; i++){
+		gotoxy(16, i);printf("*\n");
 	}
-	for(int i=12 ; i<17 ; i++){//Brazo Izq
-		gotoxy(i,13);
-		printf("*");
+	//Dibujo brazo izquierdo
+	for(int i = 12 ; i < 17 ; i++){
+		gotoxy(i,13);printf("*");
 	}
-	for(int i=15 ; i<21 ; i++){//Brazo derecho
-		gotoxy(i,13);
-		printf("*");
+	//Dibujo brazo derecho
+	for(int i = 15 ; i<21 ; i++){
+		gotoxy(i,13);printf("*");
 	}
 	//Piernas
-	gotoxy(15,18);
-	printf("* *");
-	gotoxy(14,19);
-	printf("*   *");
-	gotoxy(13,20);
-	printf("*     *");
-	gotoxy(12,21);
-	printf("*       *");
+	gotoxy(15, 18);printf("* *");
+	gotoxy(14,19);printf("*   *");
+	gotoxy(13,20);printf("*     *");
+	gotoxy(12,21);printf("*       *");
 }
 
 //FUNCION QUE IMPRIME EL DIBUJO DEL AHORCADO CUANDO PIERDES
@@ -1290,108 +1183,68 @@ void dibujoAhorcado2(){
 	system("color 0f");
 	int c = 22,f = 20;//Declaracion de las dimensiones
 	
-	for(int i = 0 ; i < f ; i++){//Ancho de Borde
-		gotoxy(i,1);
-		printf("%c",176);
+	//Alto y ancho del borde
+	for(int i = 0 ; i < f ; i++){
+		gotoxy(i,1);printf("%c",176);
 	}
-	for(int i = 0 ; i <= c ; i++){//Alto de Borde
-		gotoxy(1,i);
-		printf("%c",176);
+	for(int i = 0 ; i <= c ; i++){
+		gotoxy(1, i);printf("%c",176);
 	}
-	for(int i = 2 ; i <= 5 ; i++){//Cuerda
-		gotoxy(16,i);
-		printf("%c\n",186);
+	//Cuerda
+	for(int i = 2 ; i <= 5 ; i++){
+		gotoxy(16, i);printf("%c\n", 186);
 	}
-	gotoxy(6,6);
-	printf("         ***             \n");
-	gotoxy(6,7);
-	printf("        *****         \n");
-	gotoxy(6,8);
-	printf("       *X***X*       \n");
-	gotoxy(6,9);
-	printf("       *******     \n");
-	gotoxy(6,10);
-	printf("        **0**    \n");
-	gotoxy(6,11);
-	printf("         ***             \n");
-	
-	for(int i = 12 ; i <= 17 ; i++){//Torso
-		gotoxy(16, i);
-		printf("*\n");
+	//Cabeza sin vida
+	gotoxy(6,6);printf("         ***             \n");
+	gotoxy(6,7);printf("        *****         \n");
+	gotoxy(6,8);printf("       *X***X*       \n");
+	gotoxy(6,9);printf("       *******     \n");
+	gotoxy(6,10);printf("        **0**    \n");
+	gotoxy(6,11);printf("         ***             \n");
+	//Torso
+	for(int i = 12 ; i <= 17 ; i++){
+		gotoxy(16, i);printf("*\n");
 	}
-	for(int i = 12 ; i < 17 ; i++){//Brazo Izq
-		gotoxy(i,13);
-		printf("*");
+	//Dibujo brazo izquierdo
+	for(int i = 12 ; i < 17 ; i++){
+		gotoxy(i,13);printf("*");
 	}
-	for(int i = 15 ; i<21 ; i++){//Brazo derecho
-		gotoxy(i,13);
-		printf("*");
+	//Dibujo brazo derecho
+	for(int i = 15 ; i<21 ; i++){
+		gotoxy(i,13);printf("*");
 	}
 	//Piernas
-	gotoxy(15, 18);
-	printf("* *");
-	gotoxy(14,19);
-	printf("*   *");
-	gotoxy(13,20);
-	printf("*     *");
-	gotoxy(12,21);
-	printf("*       *");
+	gotoxy(15, 18);printf("* *");
+	gotoxy(14,19);printf("*   *");
+	gotoxy(13,20);printf("*     *");
+	gotoxy(12,21);printf("*       *");
 	//Texto
-	gotoxy(35,6);
-	printf("8888888b.      8888888     8888888b. \n");  
-	gotoxy(35,7);
-	printf("888   Y88b       888       888   Y88b\n");  
-	gotoxy(35,8);
-	printf("888    888       888       888    888\n"); 
-	gotoxy(35,9);
-	printf("888   d88P       888       888   d88P \n");
-	gotoxy(35,10);
-	printf("8888888P'        888       8888888P'  \n");
-	gotoxy(35,11);
-	printf("888 T88b         888       888   \n");
-	gotoxy(35,12);
-	printf("888  T88b  d8b   888   d8b 888     d8b \n");
-	gotoxy(35,13);
-	printf("888   T88b Y8P 8888888 Y8P 888     Y8P \n");
-	
-	system("pause>null");
+	gotoxy(35,6);printf("8888888b.      8888888     8888888b. \n");  
+	gotoxy(35,7);printf("888   Y88b       888       888   Y88b\n");  
+	gotoxy(35,8);printf("888    888       888       888    888\n"); 
+	gotoxy(35,9);printf("888   d88P       888       888   d88P \n");
+	gotoxy(35,10);printf("8888888P'        888       8888888P'  \n");
+	gotoxy(35,11);printf("888 T88b         888       888   \n");
+	gotoxy(35,12);printf("888  T88b  d8b   888   d8b 888     d8b \n");
+	gotoxy(35,13);printf("888   T88b Y8P 8888888 Y8P 888     Y8P \n");
+	getch();
 }
+
 //FUNCION QUE IMPRIME EL TITULO PRINCIPAL DEL AHORCADO
 void titulo_principal_ahorcado(){
-	int c = 20,f = 95;//Declaracion de las dimensiones
 	system("color 0a");
 	system("cls");
-	for(int i = 0 ; i < f ; i++){//Generar los bordes del cuadro de la interfaz
-		gotoxy(i,0);
-		printf("%c", 178);
-		gotoxy(i,c);
-		printf("%c", 178);
-	}
-	for(int i = 0 ; i <= c ; i++){//Genera los bordes del Cuadro de la Interfaz
-		gotoxy(0,i);
-		printf("%c",178);
-		gotoxy(f,i);
-		printf("%c",178);
-	}
-	gotoxy(2,6);
-	printf("d8888 888    888  .d88888b.  8888888b.   .d8888b.        d8888 8888888b.   .d88888b.\n");  
-	gotoxy(2,7);
-	printf("d8888 888    888  .d88888b.  8888888b.   .d8888b.        d8888 8888888b.   .d88888b.\n");  
-	gotoxy(2,8);
-	printf("d88888 888    888 d88P' 'Y88b 888   Y88b d88P  Y88b      d88888 888  'Y88b d88P' 'Y88b \n"); 
-	gotoxy(2,9);
-	printf("d88P888 888    888 888     888 888    888 888    888     d88P888 888    888 888     888 \n");
-	gotoxy(2,10);
-	printf("d88P 888 8888888888 888     888 888   d88P 888           d88P 888 888    888 888     888 \n");
-	gotoxy(2,11);
-	printf("d88P  888 888    888 888     888 8888888P0  888          d88P  888 888    888 888     888 \n");
-	gotoxy(2,12);
-	printf("d88P   888 888    888 888     888 888 T88b   888    888  d88P   888 888    888 888     888 \n");
-	gotoxy(2,13);
-	printf("d8888888888 888    888 Y88b. .d88P 888  T88b  Y88b  d88P d8888888888 888  .d88P Y88b. .d88P \n");
-	gotoxy(2,14);
-	printf("d88P     888 888    888  'Y88888P'  888   T88b  'Y8888P' d88P     888 8888888P'   'Y88888P'  \n");
-	gotoxy(28,17);
-	printf("Oprima Cualquier Tecla Para Comenzar");
-	system("pause>null");
+	//Llamamos a la funcion que genera los bordes
+	bordesSistema();
+	gotoxy(2,6);printf("d8888 888    888  .d88888b.  8888888b.   .d8888b.        d8888 8888888b.   .d88888b.\n");  
+	gotoxy(2,7);printf("d8888 888    888  .d88888b.  8888888b.   .d8888b.        d8888 8888888b.   .d88888b.\n");  
+	gotoxy(2,8);printf("d88888 888    888 d88P' 'Y88b 888   Y88b d88P  Y88b      d88888 888  'Y88b d88P' 'Y88b \n"); 
+	gotoxy(2,9);printf("d88P888 888    888 888     888 888    888 888    888     d88P888 888    888 888     888 \n");
+	gotoxy(2,10);printf("d88P 888 8888888888 888     888 888   d88P 888           d88P 888 888    888 888     888 \n");
+	gotoxy(2,11);printf("d88P  888 888    888 888     888 8888888P0  888          d88P  888 888    888 888     888 \n");
+	gotoxy(2,12);printf("d88P   888 888    888 888     888 888 T88b   888    888  d88P   888 888    888 888     888 \n");
+	gotoxy(2,13);printf("d8888888888 888    888 Y88b. .d88P 888  T88b  Y88b  d88P d8888888888 888  .d88P Y88b. .d88P \n");
+	gotoxy(2,14);printf("d88P     888 888    888  'Y88888P'  888   T88b  'Y8888P' d88P     888 8888888P'   'Y88888P'  \n");
+	gotoxy(28,17);printf("Oprima Cualquier Tecla Para Comenzar");
+	getch();
 }
