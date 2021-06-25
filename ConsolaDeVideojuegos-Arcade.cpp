@@ -47,6 +47,10 @@ void solicitarNombreBuscaminas();
 void asignarPuntaje(int puntosJugador);
 void guardarRegistroBuscaminas(player Jugador);
 void consultarRegistroBuscaminas();
+void juegoAhorcado();
+void dibujoAhorcado();
+void dibujoAhorcado2();
+void titulo_principal_ahorcado();
 
 //PROTOTIPOS DE LAS FUNCIONES DEL SNAKE	
 
@@ -63,10 +67,7 @@ void solicitarNombreSnake();
 void guardarRegistroSnake(player Jugador);
 void consultarRegistroSnake();
 void asignarPuntajeSnake();
-void juegoAhorcado();
-void dibujoAhorcado();
-void dibujoAhorcado2();
-void titulo_principal_ahorcado();
+
 
 //DECLARACION GLOBAL DE VARIABLES
 int cuerpo[200][2];
