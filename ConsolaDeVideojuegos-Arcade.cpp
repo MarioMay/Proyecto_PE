@@ -54,7 +54,7 @@ void juegoGato();
 void juegoAhorcado();
 void dibujoAhorcado();
 void dibujoAhorcado2();
-void titulo_principal_ahorcado();
+void letrasBienvenidaAhorcado();
 //Funciones del Snake	
 void ocultarCursor();
 void cuadro();
@@ -948,7 +948,7 @@ void juegoAhorcado(){
 	system("color 0b");
 	fflush(stdout);
 	//Llamada a funcion para imprimir el titulo del juego
-	titulo_principal_ahorcado();
+	letrasBienvenidaAhorcado();
 	do{
 		oportunidades = 10;
 		system("cls");
@@ -1229,7 +1229,7 @@ void dibujoAhorcado2(){
 }
 
 //Funcion que imprime el titulo principal del ahorcado
-void titulo_principal_ahorcado(){
+void letrasBienvenidaAhorcado(){
 	system("color 0a");
 	system("cls");
 	//Llamamos a la funcion que genera los bordes
