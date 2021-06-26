@@ -176,9 +176,8 @@ void instrucciones(){
 			bordesSistema();
 			gotoxy(5,1);printf("\n\t\t   **************** AHORCADO ****************\n"); 
 			gotoxy(27,4);printf("Juego de 2 o Mas Personas."); 
-			gotoxy(3,6);printf("El Juego Comienza Automaticamente Despues de Presionar Cualquier Tecla");
-			gotoxy(3,7);printf("Cualquier Jugador Debera Ingresar la Palabra a Adivinar por el Jugador ");
-			gotoxy(3,8);printf("Contrario. El Jugador Contario Debera Adivinar la Palabra Ingresando");
+			gotoxy(3,7);printf("El Juegor 1 debe introducir la palabra o frase que desea que adivinen");
+			gotoxy(3,8);printf("Contrario. El Jugador 2 Debera Adivinar la Palabra Ingresando");
 			gotoxy(3,9);printf("Letra por Letra. El Jugador Contara con 10 Vidas");
 			gotoxy(3,15);printf("Presione Cualquier Tecla Para Regresar");
 			getch();
@@ -976,7 +975,7 @@ void juegoAhorcado(){
 		system("color 09");//Limpiamos pantalla y ponemos bordes y color
 		
 		while(errores < 10){//Este ciclo se repetirá hasta que el jugador 2 gane o pierda el juego
-			if(strcmpi(frase, inputRespuestas) != 0){//Si aun no ha encontrado la respuesta se entra a este ciclo
+			if(strcmp(frase, inputRespuestas) != 0){//Si aun no ha encontrado la respuesta se entra a este ciclo
 				gotoxy(7, 2);
 				for(i = 0; i < longitudFrase; i++){
 					printf("%c ",inputRespuestas[i]);//Imprimimos los guiones bajos y las letras que haya encontrado
