@@ -1,3 +1,4 @@
+
 #include <iostream> //Biblioteca estandar en C++
 #include <stdio.h>
 #include <conio.h>
@@ -6,7 +7,7 @@
 #include <string.h> //Biblioteca para manejar cadenas
 #include <stdlib.h> //Biblioteca estandar de proposito general
 #include <stdbool.h>
-#include <unistd.h>
+
 
 //Definimos las macros a utilizar
 #define ARRIBA 72
@@ -1073,7 +1074,7 @@ void impresionPartesDelCuerpoAhorcado(int e){
 		gotoxy(26, 16); printf("*"); gotoxy(27, 17); printf("*"); 
 		gotoxy(28, 18); printf("*"); gotoxy(29, 19);printf("*");
 		gotoxy(35, 9); printf("%c SE HAN TERMINADO TUS OPORTUNIDADES %c\n\n\n\n\n\n\n\n", 186, 186);
-		sleep(3);
+		gotoxy(39, 11); printf("Presiona cualquier tecla");getch();
 	}
 	
 }
@@ -1085,23 +1086,24 @@ void buscadorDeCaracterAhorcado(char answer, char *frase, char *respuestas, int 
 	
 	for(i = 0; i < longitud; i++){//Primero buscamos si esa letra ya fue introducida por el usuario antes
 		if(respuestas[i] == answer){
-			gotoxy(40, 13); printf("Esta letra ya ha sido introducida");
-			sleep(1);
+			gotoxy(34, 15); printf("Esta letra ya ha sido introducida");
+			gotoxy(38, 16); printf("Presiona cualquier tecla");getch();
 			yaExiste = 1;//Bandera para saber si ya fue introducido el caracter antes
 		}
 	}
 	if(yaExiste == 0){//Si la letra no ha sido introducida antes por el usuario se entra a este if
 		for(i = 0; i < longitud; i++){//Ciclo para buscar si la letra está en la frase o palabra
 			if(frase[i] == answer){
-				gotoxy(40, 13); printf("Respuesta correcta");
+				
 				respuestas[i] = answer;
 				found = 1;//Bandera para saber que la respuesta es correcta
-				sleep(1);
+				gotoxy(41, 15); printf("Respuesta correcta");
+				gotoxy(38, 16); printf("Presiona cualquier tecla");getch();
 			}
 		}
 		if(found == 0){//Si no se encontró la letra en la frase se entra a este if
-			gotoxy(40, 13); printf("Respuesta incorrecta");
-			sleep(1);
+			gotoxy(40, 15); printf("Respuesta incorrecta");
+			gotoxy(38, 16); printf("Presiona cualquier tecla");getch();
 			e++;
 			*errores = e;//Uso de puntero para modificar directamente el valor de errores
 		}
