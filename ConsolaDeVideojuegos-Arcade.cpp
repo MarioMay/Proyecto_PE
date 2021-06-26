@@ -6,6 +6,7 @@
 #include <string.h> //Biblioteca para manejar cadenas
 #include <stdlib.h> //Biblioteca estandar de proposito general
 #include <stdbool.h>
+#include <unistd.h>
 
 //Definimos las macros a utilizar
 #define ARRIBA 72
@@ -52,9 +53,8 @@ void consultarRegistroBuscaminas();
 void juegoGato();
 //Funciones del Ahorcado
 void juegoAhorcado();
-void dibujoAhorcado();
-void dibujoAhorcado2();
-void letrasBienvenidaAhorcado();
+void impresionPartesDelCuerpoAhorcado(int e);
+void buscadorDeCaracterAhorcado(char answer, char *frase, char *respuestas, int *errores, int longitud);
 //Funciones del Snake	
 void ocultarCursor();
 void cuadro();
@@ -940,309 +940,171 @@ void ocultarCursor(){
 
 //Función principal del juego Ahorcado
 void juegoAhorcado(){
-	//Declaracion de variables
-	char palabra[40], rep[100], temporal[100], pal;
-	int oportunidades, victoria, puntos = 0, repetir;
-	int inicial, i, j, longitud, bien = 0, temp, repetido, i1, i2, i3, answer;
+	int i, longitudFrase, errores;
+	int seguirJugando = 1;
+	char frase[31], inputRespuestas[31];
+	char answer;//Variables de la funcion
 	
-	system("color 0b");
-	fflush(stdout);
-	//Llamada a funcion para imprimir el titulo del juego
-	letrasBienvenidaAhorcado();
-	do{
-		oportunidades = 10;
+	while(seguirJugando){//Este ciclo se repetirá hasta que el usuario desee salir
+		errores = 0;
 		system("cls");
-		fflush(stdin);
-		//Preguntamos a el jugador la palabra que guste y contamos la cantidad de caracteres 
-		dibujoAhorcado();
-		gotoxy(24, 3);printf("Jugador 1");
-		gotoxy(24, 5);printf("Introduzca la palabra o frase:");
-		gotoxy(28, 7);
-		fflush(stdin);
-		gets(palabra);
-		longitud = 0, inicial = 0, j = 0;
-		rep[0] = ' ';
-		rep[1] = '\0';
+		bordesSistema();
+		system("color 09");//Limpiamos pantalla y ponemos bordes y color
 		
-		do{
-			fflush(stdin);
-			system("cls");
-			//Llamamos a la funcion que imprime el dibujo del ahorcado
-			dibujoAhorcado();
-			temp = 0;
-			//Aqui leemos cuantos caracteres va a tener la palabra, y ponemos un espaco en blanco
-			if(inicial == 0){
-				i1=strlen(palabra);
-				for(i = 0; i < i1; i++){
-					if(palabra[i] == ' '){
-						temporal[i] = ' ';
-						longitud++;
-					}
-					else {
-						temporal[i] = '_';       
-						longitud++;
-					}
-				}
-			}
-			//Cambiamos el valor inicial para seguir corriendo el programa
-			inicial = 1;
-			temporal[longitud] = '\0';
-			//Verificamos si la letra esta repetida o escribimos la letra
-			i2 = strlen(rep);
-			for(i = 0; i < i2; i++){
-				if(rep[i] == pal){
-					repetido = 1;
-					break;
-				}
-				else{
-					repetido = 0;
-				}
-			}
-			//Si no esta repetida la letra la imprimimos en temporal y aumentamos el contador de bien
-			if(repetido == 0){
-				for(i = 0; i < i1; i++){
-					if(palabra[i] == pal){
-						temporal[i] = pal;
-						bien++;
-						puntos += 10;
-						temp = 1;
-					}
-				}
-			}
-			//Si n se escribio nada mas se quita una de las oportunidades
-			if(repetido == 0){
-				puntos -= 2;
-				if(temp == 0){
-					oportunidades -= 1;
-				}
+		gotoxy(5,1);//Bienvenida al juego
+		printf("\t\t\t  ***JUEGO AHORCADO***\n\n");
+		printf("\tJUGADOR 1\n\n");
+		printf("\tIntroducir la palabra o frase (M%cximo 30 car%ccteres):\n\n\t",160,160);
+		fflush(stdin);
+		gets(frase);
+		
+		//En esta sección se va a inicializar inputRespuesta, con guiones bajos para que el jugador 2 
+		//sepa cuantas letras tiene la palabra o frase.
+		longitudFrase = strlen(frase);
+		for(i = 0; i < longitudFrase; i++){
+			if(frase[i] == ' '){
+				inputRespuestas[i] = ' ';
 			}
 			else{
-				printf("Ya se ha introducido este caracter");
-				printf("\n\n");
+				inputRespuestas[i] = '_';
 			}
-			printf("\n");
-			//Imprimimos la letra
-			gotoxy(35,6);
-			i3 = strlen(temporal);
-			for(i = 0; i < i3; i++) {
-				printf(" %c ", temporal[i]);
-			}
-			printf("\n");
-			//Verificamos si gana
-			if(strcmp(palabra,temporal) == 0){
-				victoria = 1;
-				break;
-			}
-			gotoxy(45,1);printf("Letras Bien: %d", bien);
-			gotoxy(63,1);printf("Puntaje: %d", puntos + 2);
-			//Barra de vida
-			gotoxy(23,1);printf("Vidas Restantes: %d", oportunidades);
-			rep[j] = pal;
-			j++;
-			//Verificamos si pierde
-			if(oportunidades == 0){
-				break;
-			}
-			gotoxy(32,4);printf("Jugador 2 Introduzca una letra:");
-			scanf("\n%c", &pal);
-			
-		}while(oportunidades != 0);
+		}
+		inputRespuestas[longitudFrase] = '\0';
 		
-		if(victoria == 1) {
-			system("cls");
-			gotoxy(2,6);printf("Y88b   d88P                     888       888 d8b \n");  
-			gotoxy(2,7);printf(" Y88b d88P                      888   o   888 Y8P \n");  
-			gotoxy(2,8);printf("  Y88o88P                       888  d8b  888           \n"); 
-			gotoxy(2,9);printf("   Y888P  .d88b.  888  888      888 d888b 888 888 88888b.\n");
-			gotoxy(2,10);printf("    888  d88''88b 888  888      888d88888b888 888 888 '88b\n");
-			gotoxy(2,11);printf("    888  888  888 888  888      88888P Y88888 888 888  888 \n");
-			gotoxy(2,12);printf("    888  Y88..88P Y88b 888      8888P   Y8888 888 888  888 \n");
-			gotoxy(2,13);printf("    888   'Y88P'   'Y88888      888P     Y888 888 888  888 \n");
-			gotoxy(28,17);
-			gotoxy(28,17);printf("¿Desea Jugar de Nuevo?: 1 - Si    0 - No \n");
-			fflush(stdin);
-			do{
-				scanf("%d", &answer);
+		system("cls");
+		bordesSistema();
+		system("color 09");//Limpiamos pantalla y ponemos bordes y color
+		
+		while(errores < 10){//Este ciclo se repetirá hasta que el jugador 2 gane o pierda el juego
+			if(strcmpi(frase, inputRespuestas) != 0){//Si aun no ha encontrado la respuesta se entra a este ciclo
+				gotoxy(7, 2);
+				for(i = 0; i < longitudFrase; i++){
+					printf("%c ",inputRespuestas[i]);//Imprimimos los guiones bajos y las letras que haya encontrado
+				}
+				impresionPartesDelCuerpoAhorcado(errores);//Llamamos a la funcion para imprimir el dibujo del ahorcado
+				
+				gotoxy(40, 7); printf("JUGADOR 2");
+				gotoxy(40, 8); printf("Oportunidades: %i ", 10 - errores);
+				gotoxy(40, 11); printf("Introduzca una letra: "); scanf("%c",&answer);//Entrada de la respuesta
+				buscadorDeCaracterAhorcado(answer, frase, inputRespuestas, &errores, longitudFrase);//Buscamos el caracter en la frase
 				fflush(stdin);
-				if(answer == 1){
-					repetir = 1;
-					system("cls");
-					break;
-					puntos = 0;
-					oportunidades = 10;
-					victoria = 0;
-					inicial = 1;
-					i = 0;j = 0;
-					longitud = 0;
-					bien = 0;
-					temp = 0; i1 = 0; i2 = 0; i3 = 0;
-				}
-				if(answer == 0){
-					repetir = 0;
-					menuJuegos();
-				}
-				if(answer != 1|| answer != 0){
-					puts("\n<<Caracter No Valido>>\n");
-				}
-			}while(answer != 1 || answer != 0);
-			system("cls");	
-		}
-		else {
-			dibujoAhorcado2();
-			system("cls");
-			gotoxy(2,6);printf("Y88b   d88P  .d88888b.  888     888      888      .d88888b.   .d8888b.  8888888888 \n");  
-			gotoxy(2,7);printf(" Y88b d88P  d88P' 'Y88b 888     888      888     d88P' 'Y88b d88P  Y88b 888\n");  
-			gotoxy(2,8);printf("  Y88o88P   888     888 888     888      888     888     888 Y88b.      888   \n"); 
-			gotoxy(2,9);printf("   Y888P    888     888 888     888      888     888     888  'Y888b.   8888888\n");
-			gotoxy(2,10);printf("    888     888     888 888     888      888     888     888     'Y88b. 888\n");
-			gotoxy(2,11);printf("    888     888     888 888     888      888     888     888       '888 888        \n");
-			gotoxy(2,12);printf("    888     Y88b. .d88P Y88b. .d88P      888     Y88b. .d88P Y88b  d88P 888 \n");
-			gotoxy(2,13);printf("    888      'Y88888P'   'Y88888P'       88888888 'Y88888P'   'Y8888P'  8888888888\n");
-			gotoxy(28,17);printf("¿Desea Jugar de Nuevo?: 1 - Si    0 - No \n");
-			fflush(stdin);
-			do{
-				scanf("%d", &answer);
+			}
+			else{//Cuando el usuario haya completado la frase se muestra esta pantalla
+				gotoxy(7, 2); printf("Frase: "); puts(frase);
+				gotoxy(2,6);printf("Y88b   d88P                     888       888 d8b \n");  
+				gotoxy(2,7);printf(" Y88b d88P                      888   o   888 Y8P \n");  
+				gotoxy(2,8);printf("  Y88o88P                       888  d8b  888           \n"); 
+				gotoxy(2,9);printf("   Y888P  .d88b.  888  888      888 d888b 888 888 88888b.\n");
+				gotoxy(2,10);printf("    888  d88''88b 888  888      888d88888b888 888 888 '88b\n");
+				gotoxy(2,11);printf("    888  888  888 888  888      88888P Y88888 888 888  888 \n");
+				gotoxy(2,12);printf("    888  Y88..88P Y88b 888      8888P   Y8888 888 888  888 \n");
+				gotoxy(2,13);printf("    888   'Y88P'   'Y88888      888P     Y888 888 888  888 \n");
+				gotoxy(28,17);
+				gotoxy(28,17);printf("Desea Jugar de Nuevo? (1 - Si    0 - No): ");
 				fflush(stdin);
-				if(answer == 1){
-					repetir = 1;
-					system("cls");
-					break;
-					puntos = 0;
-					oportunidades = 10;
-					victoria = 0;
-					inicial = 1;
-					i = 0;j = 0;
-					longitud = 0;
-					bien = 0;
-					temp = 0;
-					i1 = 0;
-					i2 = 0;
-					i3 = 0;
-				}
-				if(answer == 0){
-					repetir = 0;
-					menuJuegos();
-				}
-				if((answer != 1) || (answer != 0)){
-					puts("\n<<Caracter No Valido>>\n");
-				}
-			}while((answer != 1) || (answer != 0));
-			system("cls");	
+				scanf("%i", &seguirJugando);//Entrada
+				errores = 11;//Le asignamos este valor para poder salir del ciclo while 
+			}
+			system("cls");
+			bordesSistema();
+			system("color 09");	//Limpiamos pantalla y ponemos bordes y color
 		}
-		//Se repite el juego hasta que el usuario desee salir
-	}while(repetir);
+		if(errores == 10){//Si el usuario perdió se mostraran estas dos pantallas
+			impresionPartesDelCuerpoAhorcado(errores);//Pantalla con el ahorcado muerto
+			system("cls");
+			bordesSistema();
+			system("color 09");//Limpiamos pantalla y ponemos bordes y color
+			gotoxy(7, 2); printf("Frase: "); puts(frase);
+			gotoxy(20,6);printf("8888888b.      8888888     8888888b. \n");  
+			gotoxy(20,7);printf("888   Y88b       888       888   Y88b\n");  
+			gotoxy(20,8);printf("888    888       888       888    888\n"); 
+			gotoxy(20,9);printf("888   d88P       888       888   d88P \n");
+			gotoxy(20,10);printf("8888888P'        888       8888888P'  \n");
+			gotoxy(20,11);printf("888 T88b         888       888   \n");
+			gotoxy(20,12);printf("888  T88b  d8b   888   d8b 888     d8b \n");
+			gotoxy(20,13);printf("888   T88b Y8P 8888888 Y8P 888     Y8P \n");
+			gotoxy(20,17);printf("¿Desea Jugar de Nuevo? (1 - Si    0 - No): ");
+			fflush(stdin);
+			scanf("%i", &seguirJugando);//Entrada
+		}
+	}
+	menuJuegos();
 }
 
-//Funcion para imprimir el primer dibujo del ahorcado
-void dibujoAhorcado(){
-	//Declaracion de las variables dimensiones
-	int c = 22, f = 20;
-	system("color 0f");
-	//Alto y ancho del borde
-	for(int i = 0 ; i < f ; i++){
-		gotoxy(i,1);printf("%c",176);
+//Funcion para imprimir el dibujo del ahorcado
+void impresionPartesDelCuerpoAhorcado(int e){
+	int i;
+	//Dependiendo el numero de erroes se imprime diferentes partes del ahorcado
+	if(e > 0){//Impresion del poste vertical
+		for(i = 4 ; i < 22 ; i++){gotoxy(7, i); printf("%c", 176);}
 	}
-	for(int i = 0 ; i <= c ; i++){
-		gotoxy(1, i);printf("%c",176);
+	if(e > 1){//Impresion del poste horizontal
+		for(i = 8 ; i < 26 ; i++){gotoxy(i, 4); printf("%c", 176);}
 	}
-	//Dibujo de la cuerda
-	for(int i = 2 ; i <= 5 ; i++){
-		gotoxy(16, i);printf("%c\n", 186);
+	if(e > 2){//Impresion de la cuerda
+		for(i = 5 ; i < 7 ; i++){gotoxy(25, i); printf("%c\n", 186);}
 	}
-	//Dibujo de la cabeza con vida
-	gotoxy(6,6);printf("         ***             \n");
-	gotoxy(6,7);printf("        *****         \n");
-	gotoxy(6,8);printf("       *0***0*       \n");
-	gotoxy(6,9);printf("       *******     \n");
-	gotoxy(6,10);printf("        *****    \n");
-	gotoxy(6,11);printf("         ***             \n");
-	//Dibujo del torso
-	for(int i = 12 ; i <= 17 ; i++){
-		gotoxy(16, i);printf("*\n");
+	if(e > 3){//Impresion Cara
+		if( e == 10){//Impresion Cara muerta
+			gotoxy(23, 7); printf("*****"); gotoxy(22, 8); printf("* X X *");
+			gotoxy(22, 9); printf("*  o  *");gotoxy(23, 10); printf("*****");
+		}
+		else{//Impresion Cara enojada
+			gotoxy(23, 7); printf("*****"); gotoxy(22, 8); printf("* %c %c *",149, 162);
+			gotoxy(22, 9); printf("*  -  *");gotoxy(23, 10); printf("*****");
+		}
 	}
-	//Dibujo brazo izquierdo
-	for(int i = 12 ; i < 17 ; i++){
-		gotoxy(i,13);printf("*");
+	if(e > 4){//Impresion cuello
+		gotoxy(25,11),printf("*");gotoxy(25,12),printf("*");
 	}
-	//Dibujo brazo derecho
-	for(int i = 15 ; i<21 ; i++){
-		gotoxy(i,13);printf("*");
+	if(e > 5){//Impresion brazo derecho
+		for(i = 20; i < 25; i++){gotoxy(i, 12); printf("*");}
 	}
-	//Dibujo de las piernas
-	gotoxy(15, 18);printf("* *");
-	gotoxy(14,19);printf("*   *");
-	gotoxy(13,20);printf("*     *");
-	gotoxy(12,21);printf("*       *");
-}
-
-//Funcion que imprime el dibujo del ahorcado cuando pierdes
-void dibujoAhorcado2(){
-	//Declaracion de las variables dimensiones
-	int c = 22,f = 20;
+	if(e > 6){//Impresion brazo izquierdo
+		for(i = 26; i < 31; i++){gotoxy(i, 12); printf("*");}
+	}
+	if(e > 7){//Impresion torso
+		for(i = 13; i < 16; i++){gotoxy(25, i); printf("*");}
+	}
+	if(e > 8){//Impresion Pierna derecha
+		gotoxy(24, 16); printf("*"); gotoxy(23, 17); printf("*"); 
+		gotoxy(22, 18); printf("*"); gotoxy(21, 19);printf("*");
+	}
+	if(e > 9){//Ultima impresion de cuerpo
+		gotoxy(26, 16); printf("*"); gotoxy(27, 17); printf("*"); 
+		gotoxy(28, 18); printf("*"); gotoxy(29, 19);printf("*");
+		gotoxy(35, 9); printf("%c SE HAN TERMINADO TUS OPORTUNIDADES %c\n\n\n\n\n\n\n\n", 186, 186);
+		sleep(3);
+	}
 	
-	system("color 0f");
-	//Alto y ancho del borde
-	for(int i = 0 ; i < f ; i++){
-		gotoxy(i,1);printf("%c",176);
-	}
-	for(int i = 0 ; i <= c ; i++){
-		gotoxy(1, i);printf("%c",176);
-	}
-	//Dibujo de la cuerda
-	for(int i = 2 ; i <= 5 ; i++){
-		gotoxy(16, i);printf("%c\n", 186);
-	}
-	//Dibujo de la cabeza sin vida
-	gotoxy(6,6);printf("         ***             \n");
-	gotoxy(6,7);printf("        *****         \n");
-	gotoxy(6,8);printf("       *X***X*       \n");
-	gotoxy(6,9);printf("       *******     \n");
-	gotoxy(6,10);printf("        **0**    \n");
-	gotoxy(6,11);printf("         ***             \n");
-	//Dibujo del torso
-	for(int i = 12 ; i <= 17 ; i++){
-		gotoxy(16, i);printf("*\n");
-	}
-	//Dibujo brazo izquierdo
-	for(int i = 12 ; i < 17 ; i++){
-		gotoxy(i,13);printf("*");
-	}
-	//Dibujo brazo derecho
-	for(int i = 15 ; i<21 ; i++){
-		gotoxy(i,13);printf("*");
-	}
-	//Dibujo de las piernas
-	gotoxy(15, 18);printf("* *");
-	gotoxy(14,19);printf("*   *");
-	gotoxy(13,20);printf("*     *");
-	gotoxy(12,21);printf("*       *");
-	//Texto
-	gotoxy(35,6);printf("8888888b.      8888888     8888888b. \n");  
-	gotoxy(35,7);printf("888   Y88b       888       888   Y88b\n");  
-	gotoxy(35,8);printf("888    888       888       888    888\n"); 
-	gotoxy(35,9);printf("888   d88P       888       888   d88P \n");
-	gotoxy(35,10);printf("8888888P'        888       8888888P'  \n");
-	gotoxy(35,11);printf("888 T88b         888       888   \n");
-	gotoxy(35,12);printf("888  T88b  d8b   888   d8b 888     d8b \n");
-	gotoxy(35,13);printf("888   T88b Y8P 8888888 Y8P 888     Y8P \n");
-	getch();
 }
 
-//Funcion que imprime el titulo principal del ahorcado
-void letrasBienvenidaAhorcado(){
-	system("color 0a");
-	system("cls");
-	//Llamamos a la funcion que genera los bordes
-	bordesSistema();
-	gotoxy(2,6);printf("d8888 888    888  .d88888b.  8888888b.   .d8888b.        d8888 8888888b.   .d88888b.\n");  
-	gotoxy(2,7);printf("d8888 888    888  .d88888b.  8888888b.   .d8888b.        d8888 8888888b.   .d88888b.\n");  
-	gotoxy(2,8);printf("d88888 888    888 d88P' 'Y88b 888   Y88b d88P  Y88b      d88888 888  'Y88b d88P' 'Y88b \n"); 
-	gotoxy(2,9);printf("d88P888 888    888 888     888 888    888 888    888     d88P888 888    888 888     888 \n");
-	gotoxy(2,10);printf("d88P 888 8888888888 888     888 888   d88P 888           d88P 888 888    888 888     888 \n");
-	gotoxy(2,11);printf("d88P  888 888    888 888     888 8888888P0  888          d88P  888 888    888 888     888 \n");
-	gotoxy(2,12);printf("d88P   888 888    888 888     888 888 T88b   888    888  d88P   888 888    888 888     888 \n");
-	gotoxy(2,13);printf("d8888888888 888    888 Y88b. .d88P 888  T88b  Y88b  d88P d8888888888 888  .d88P Y88b. .d88P \n");
-	gotoxy(2,14);printf("d88P     888 888    888  'Y88888P'  888   T88b  'Y8888P' d88P     888 8888888P'   'Y88888P'  \n");
-	gotoxy(28,17);printf("Oprima Cualquier Tecla Para Comenzar");
-	getch();
+//Funcion para buscar si la respuesta del jugador es correcta en el ahorcado
+void buscadorDeCaracterAhorcado(char answer, char *frase, char *respuestas, int *errores, int longitud){
+	int i, e = *errores;//e guarda el valor que está en la direcciones de errores
+	int yaExiste = 0, found = 0;//Banderas
+	
+	for(i = 0; i < longitud; i++){//Primero buscamos si esa letra ya fue introducida por el usuario antes
+		if(respuestas[i] == answer){
+			gotoxy(40, 13); printf("Esta letra ya ha sido introducida");
+			sleep(1);
+			yaExiste = 1;//Bandera para saber si ya fue introducido el caracter antes
+		}
+	}
+	if(yaExiste == 0){//Si la letra no ha sido introducida antes por el usuario se entra a este if
+		for(i = 0; i < longitud; i++){//Ciclo para buscar si la letra está en la frase o palabra
+			if(frase[i] == answer){
+				gotoxy(40, 13); printf("Respuesta correcta");
+				respuestas[i] = answer;
+				found = 1;//Bandera para saber que la respuesta es correcta
+				sleep(1);
+			}
+		}
+		if(found == 0){//Si no se encontró la letra en la frase se entra a este if
+			gotoxy(40, 13); printf("Respuesta incorrecta");
+			sleep(1);
+			e++;
+			*errores = e;//Uso de puntero para modificar directamente el valor de errores
+		}
+	}
 }
