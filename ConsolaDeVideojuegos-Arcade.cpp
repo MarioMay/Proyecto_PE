@@ -6,15 +6,12 @@
 #include <time.h> //Biblioteca para manejar la fecha y hora del sistema
 #include <string.h> //Biblioteca para manejar cadenas
 #include <stdlib.h> //Biblioteca estandar de proposito general
-#include <stdbool.h>
-
 
 //Definimos las macros a utilizar
 #define ARRIBA 72
+#define ABAJO 80
 #define IZQUIERDA 75
 #define DERECHA 77
-#define ABAJO 80
-#define ESC 27
 #define fila 15
 #define columna 15
 
@@ -32,6 +29,7 @@ player Jugador;
 void gotoxy(int x, int y);
 void bordesSistema();
 void tituloPrincipal();
+void tituloDespedida();
 void menuPrincipal();
 void instrucciones();
 void creditos();
@@ -45,11 +43,11 @@ int generarBombas(int x);
 void colocarBombas(int matriz[][15], int bomb);
 void generarTablero(int matriz[][15],int status);
 void aumentarPuntosAciertos(int cont);
-void cronometroBuscaminas(int status);
 void juegoBuscaminas();
 void solicitarNombreBuscaminas();
 void guardarRegistroBuscaminas(player Jugador);
 void consultarRegistroBuscaminas();
+void consultarRegistroSnake();
 //Funcion del Gato
 void juegoGato();
 //Funciones del Ahorcado
@@ -57,28 +55,18 @@ void juegoAhorcado();
 void impresionPartesDelCuerpoAhorcado(int e);
 void buscadorDeCaracterAhorcado(char answer, char *frase, char *respuestas, int *errores, int longitud);
 //Funciones del Snake	
-void ocultarCursor();
-void cuadro();
-void guardar_posicion();
-void dibujar_cuerpo();
-void borrar_cuerpo();
-void teclear();
-void comida();
-bool perder();
-void mainSnake();
+void juegoSnake();
+void ocultarCursorSnake();
+void limiteCuadroDeJuegoSnake();
+void posicionEnPantallaSnake(int **cuerpoSerpiente, int *n, int dimensionSnake, int x, int y);
+void cuerpoEnPantallaSnake(int **cuerpoSerpiente, int dimensionSnake);
+void borrarCuerpoSnake(int **cuerpoSerpiente, int n);
+int direccionSnake(char inputTecla, int direccionActual);
+void comidaSerpiente(int x, int y, int *px2, int *py2, int *pdimensionSnake, int *pPuntos);
+bool choqueConBorde(int **cuerpoSerpiente, int x, int y, int dimensionSnake);
 void solicitarNombreSnake();
 void guardarRegistroSnake(player Jugador);
-void consultarRegistroSnake();
-void asignarPuntajeSnake();
-
-//DECLARACION GLOBAL DE VARIABLES
-int cuerpo[200][2];
-int n = 1, tam = 10, dir = 3;
-int x = 10, y = 12;
-int xc = 30, yc = 15;
-int velocidad = 80;
-int puntos=0;
-char tecla;
+void asignarPuntajeSnake(int puntos);
 
 //Funcion principal
 int main(int argc, char *argv[]) {
@@ -239,8 +227,7 @@ void menuPrincipal(){
 		case 0:
 			//Finaliza la ejecucion del programa
 			system("cls");
-			printf("\n\n\n\n\t\t\t       ¡GRACIAS POR UTILIZAR!      ");
-			getch();
+			tituloDespedida();
 			exit(1);
 			break;
 		}
@@ -294,7 +281,7 @@ void menuJuegos(){
 		case 3:
 			//Juego de Snake
 			system("cls");
-			mainSnake();
+			juegoSnake();
 			break;
 		case 4:
 			//Juego de ahorcado
@@ -326,6 +313,20 @@ void tituloPrincipal(){
 	gotoxy(2,17);puts("                     Oprima Cualquier Tecla Para Comenzar              \n");
 	getch();
 	system("cls");
+}
+
+//Funcion que despliega el mensaje de salida 
+void tituloDespedida(){
+	bordesSistema();
+	gotoxy(13,6);printf("       d8888 8888888b. 8888888 .d88888b.   .d8888b. \n");  
+	gotoxy(13,7);printf("      d88888 888   Y88b  888  d88P   Y88b d88P  Y88b \n");  
+	gotoxy(13,8);printf("     d88P888 888    888  888  888     888 Y88b.      \n"); 
+	gotoxy(13,9);printf("    d88P 888 888    888  888  888     888   Y888b.   \n");
+	gotoxy(13,10);printf("   d88P  888 888    888  888  888     888      Y88b. \n");
+	gotoxy(13,11);printf("  d88P   888 888    888  888  888     888       888 \n");
+	gotoxy(13,12);printf(" d8888888888 888  .d88P  888  Y88b. .d88P Y88b  d88P \n");
+	gotoxy(13,13);printf("d88P     888 8888888P  8888888  Y88888P     Y8888P   \n");
+	getch();
 }
 
 //Funcion para llenar el tablero de Buscaminas
@@ -415,24 +416,6 @@ void aumentarPuntosAciertos(int cont){
 	int auxiliar;
 	auxiliar = cont * 25;
 	printf("\n\t\t\t\tPuntaje: %d \n\n", auxiliar);
-}
-
-//Funcion para llevar el tiempo
-void cronometroBuscaminas(int status){
-	int horas = 0, min = 0, sec = 0, x;
-	while(status != 1 && status != 0){
-		x = 1000;
-		sec++;
-		if(sec == 60){
-			sec = 0;
-			min++;
-		}if(min == 60){
-			min = 0;
-			horas++;
-		}
-		printf("Tiempo: %.2d:%.2d:%.2d", horas, min, sec);
-		Sleep(x);
-	}
 }
 
 //Funcion que permite generar el juego de Buscaminas
@@ -542,7 +525,7 @@ void juegoGato(){
 	int jugador = 1, empate = 0, ganar = 0, error;
 	char c1 = '1', c2 = '2', c3 = '3', c4 = '4', c5 = '5', c6 = '6', c7 = '7', c8 = '8', c9 = '9';
 	char tiro, marca, respuesta = 'y';
-
+	
 	do{
 		system("cls");
 		//Llamamos a la funcion que genera los bordes
@@ -559,7 +542,7 @@ void juegoGato(){
 		printf("\n\t\t\t     %c | %c | %c\n", c4, c5, c6);
 		printf("\t\t\t    ---+---+---\n");
 		printf("\n\t\t\t     %c | %c | %c\n\n\n", c7, c8, c9);
-
+		
 		//Asignacon de marca para cada jugador
 		if(jugador == 1){
 			marca = 'X';
@@ -662,7 +645,7 @@ void juegoGato(){
 			gotoxy(3,15);printf("¿Desea Jugar de Nuevo?: Si.(Oprima 'y')    No. (Cualquier Otra Tecla)  ");
 			fflush(stdin);
 			gotoxy(75,15);scanf("%c", &respuesta);
-			
+			menuJuegos();
 			//Condicional para el caso si se quiere volver a jugar, reimpresión del tablero y reinicio de contadores
 			if (respuesta=='y' || respuesta=='Y'){
 				empate=0;
@@ -686,8 +669,8 @@ void juegoGato(){
 			}else{
 				jugador=1;
 			}
-		}	
-	//Ciclo para repetir el juego hasta que se desee salir
+		}
+		//Ciclo para repetir el juego hasta que se desee salir
 	}while(respuesta=='y' || respuesta=='Y');
 }
 
@@ -782,110 +765,154 @@ void consultarRegistroBuscaminas(){
 }
 
 //Funcion principal del juego Snake
-void mainSnake(){
-	system("mode con cols=80 lines=25");
- 	gotoxy(35,1);printf("JUEGO SNAKE");
- 	printf("\n\n");
-	ocultarCursor();
- 	cuadro();
- 	gotoxy(xc, yc); printf("%c", 4);
- 
- 	while((tecla != ESC) && perder()){
- 		gotoxy(3,2);printf("PUNTUACION: %i", puntos);
-		borrar_cuerpo();
-		guardar_posicion();
-		dibujar_cuerpo();
-		comida();
-		teclear();
-		teclear();
-		if(dir == 1) y--;
-		if(dir == 2) y++;
-		if(dir == 3) x++;
-		if(dir == 4) x--;
-		Sleep(velocidad);
- 	}
-	
- 	system("cls");
- 	gotoxy(35,1);printf("JUEGO SNAKE");
- 	cuadro();
- 	gotoxy(22,12);printf("OBTUVISTE UNA PUNTUACION DE: %i", puntos);
- 	gotoxy(22,14);printf("Presione una tecla para continuar..");
- 	solicitarNombreSnake();
- 	guardarRegistroSnake(Jugador);
- 	menuJuegos();
- 	getch();
-}
-
-//Funcion que imprime el recuadro del juego Snake
-void cuadro(){ 
-	int i, v;
-	for(i = 2; i < 78; i++){
-		gotoxy(i,4);printf("%c",205);
- 		gotoxy(i,23);printf("%c",205); 
-	}
-	for(v = 4; v < 23; v++){
- 		gotoxy(2,v);printf("%c",186);
- 		gotoxy(77,v);printf("%c",186); 
-	}
- 	gotoxy(2,4);printf("%c",201);
- 	gotoxy(2,23);printf("%c",200);
- 	gotoxy(77,4);printf("%c",187);
- 	gotoxy(77,23);printf("%c",188); 
-}
- 
-//Funcion que guarda la posicion en la que se encuentra la serpiente
-void guardar_posicion(){
-	cuerpo[n][0] = x;
- 	cuerpo[n][1] = y;
- 	n++;
- 	if(n == tam) n = 1;
-}
-
-//Funcion que dibuja el cuerpo de la serpiente
-void dibujar_cuerpo(){
-	int i;
-	for(i = 1; i < tam; i++){
- 		gotoxy(cuerpo[i][0],cuerpo[i][1]);printf("*");
-	}
-}
-
-//Funcion que borra el cuerpo de la serpiente (se borra la ultima parte del cuerpo)
-void borrar_cuerpo(){
-	gotoxy(cuerpo[n][0],cuerpo[n][1]);printf(" ");
-}
- 
-//Funcion que detecta que tecla se esta presionando
-void teclear(){
-	if(kbhit()){
-		tecla = getch();
-	 	switch(tecla){
-			case ARRIBA : if(dir != 2) dir = 1; break;
-	 		case ABAJO : if(dir != 1) dir = 2; break;
-	 		case DERECHA : if(dir != 4) dir = 3; break;
-	 		case IZQUIERDA : if(dir != 3) dir = 4; break;
+void juegoSnake(){
+	int i, n;//Variables de la funcion
+	int repetir = 1, puntos, opcionNivel, dimensionSnake, direccionActual, velocidad;
+	int x, y, x2, y2;//Estas variables sirven para guardar el valor de la ubicacion en la pantalla
+	char inputTecla;
+	while(repetir){
+		dimensionSnake = 10, direccionActual = 3, puntos = 0;
+		n = 1, x = 10, y = 12, x2 = 30, y2 = 15;
+		inputTecla = 77;//Inicializamos variables para cada juego nuevo
+		
+		int **cuerpoSerpiente;//Declaramos la matriz del cuerpo como puntero doble para poder pasarlo a las funciones
+		cuerpoSerpiente=(int**)calloc(200,sizeof(int*));//Le asignamos memoria a la matriz
+		for(i = 0; i < 200;i++){
+			cuerpoSerpiente[i]=(int *)calloc(2,sizeof(int));
 		}
- 	}
+		
+		system("cls");
+		bordesSistema();
+		system("color 0c");//Limpiamos pantalla y ponemos bordes y color
+		gotoxy(11,4);printf(" .d8888b.  888b    888        d8888 888    d8P  8888888888\n");  
+		gotoxy(11,5);printf("d88P  Y88b 8888b   888       d88888 888   d8P   888\n");  
+		gotoxy(11,6);printf("Y88b.      88888b  888      d88P888 888  d8P    888\n"); 
+		gotoxy(11,7);printf("  Y888b.   888Y88b 888     d88P 888 888d88K     8888888 \n");
+		gotoxy(11,8);printf("     Y88b. 888 Y88b888    d88P  888 8888888b    888        \n");
+		gotoxy(11,9);printf("       888 888  Y88888   d88P   888 888  Y88b   888        \n");
+		gotoxy(11,10);printf(" Y88b d88P 888   Y8888  d8888888888 888   Y88b  888        \n");
+		gotoxy(11,11);printf("   Y8888P  888    Y888 d88P     888 888    Y88b 8888888888 \n");
+		gotoxy(28,14);printf("1. Facil");gotoxy(28,16);printf("2. Dificil");
+		gotoxy(25,19);printf("Seleccione un nivel (1 o 2): ");scanf("%i", &opcionNivel);//Entrada de nivel seleccionado por el usuario
+		if(opcionNivel == 1) velocidad = 150;
+		else velocidad = 70;//La velocidad del sleep será menor y por lo tanto la serpiente se moverá mas rápido
+		
+		system ("color 0c");
+		system ("cls");
+		ocultarCursorSnake();
+		limiteCuadroDeJuegoSnake();//LLamada a funciones para preparar la pantalla de juego
+		gotoxy(x2, y2); printf("%c", 254);//Imprimimos la primer comida del snake
+		
+		while(choqueConBorde(cuerpoSerpiente, x, y, dimensionSnake)){//Este ciclo se repetirá hasta que la serpiente choque
+			gotoxy(22,1);printf("Puntuacion: %i", puntos);//Salida de puntaje acumulado
+			
+			borrarCuerpoSnake(cuerpoSerpiente, n);
+			posicionEnPantallaSnake(cuerpoSerpiente, &n, dimensionSnake, x, y);
+			cuerpoEnPantallaSnake(cuerpoSerpiente, dimensionSnake);
+			comidaSerpiente(x, y, &x2, &y2, &dimensionSnake, &puntos);//Llamada a funciones 
+			
+			direccionActual = direccionSnake(inputTecla, direccionActual);
+			direccionActual = direccionSnake(inputTecla, direccionActual);
+			direccionActual = direccionSnake(inputTecla, direccionActual);//Se llama 3 veces a la función para que el usuario tenga tiempo de teclear
+			
+			if(direccionActual == 1){ y--; Sleep(velocidad);}
+			if(direccionActual == 2){ y++; Sleep(velocidad);}
+			if(direccionActual == 3){ x++; Sleep(velocidad - 45);}
+			if(direccionActual == 4){ x--; Sleep(velocidad - 45);}//En caso de ir para arriba o abajo, se baja un poco la velocidad para que sea proporcional
+			
+		}
+		
+		system("cls");
+		limiteCuadroDeJuegoSnake();//Al perder se muestra esta pantalla
+		gotoxy(22,12);printf("Tu puntaje fue de: %i puntos", puntos);
+		gotoxy(20,16);printf ("¿Intentar de Nuevo? (0 = No  1 = Si): ");
+		scanf("%d", &repetir);//Entrada de valor para saber si vamos a repetir el juego
+	}
+	solicitarNombreSnake();//Si ya no quiere intenar de nuevo, pedimos los datos para guardar el puntaje
+	asignarPuntajeSnake(puntos);
+	guardarRegistroSnake(Jugador);
+	menuJuegos();
+	getch();
 }
 
-//Funcion que muestra la comida de forma aleatoria en alguna zona de la pantalla
-void comida(){
-	if((x == xc) && (y == yc)){
-		xc = (rand() % 73) + 4;
- 		yc = (rand() % 18) + 5;
- 		tam++;
- 		puntos += 100;
- 		gotoxy(xc,yc);printf("%c", 4);
+//Funcion para delimitar el área del juego snake
+void limiteCuadroDeJuegoSnake(){ 
+	int i, j;
+	for(i = 2; i < 78; i++){
+		gotoxy(i,4);printf("%c",178);
+		gotoxy(i,23);printf("%c",178); 
+	}
+	for(j = 4; j < 23; j++){
+		gotoxy(2,j);printf("%c",178);
+		gotoxy(77,j);printf("%c",178); 
+	}
+	gotoxy(2,4);printf("%c",178);
+	gotoxy(2,23);printf("%c",178);
+	gotoxy(77,4);printf("%c",178);
+	gotoxy(77,23);printf("%c",178); 
+}
+
+//Funcion para posicionar a la serpiente
+void posicionEnPantallaSnake(int **cuerpoSerpiente, int *n, int dimensionSnake, int x, int y){
+	int i = *n;//Tomamos el valor que está en la dirección de n y se la asignamos a la variable local i
+	cuerpoSerpiente[i][0] = x;
+	cuerpoSerpiente[i][1] = y;
+	i++;
+	if(i == dimensionSnake){ i = 1;}
+	*n = i;//Regrasamos a la direccion el nuevo valor 
+}
+
+//Funcion para imprimir a la serpiente
+void cuerpoEnPantallaSnake(int **cuerpoSerpiente, int dimensionSnake){
+	int i;
+	for(i = 1; i < dimensionSnake; i++){
+		gotoxy(cuerpoSerpiente[i][0],cuerpoSerpiente[i][1]);printf("%c",219);
 	}
 }
 
-//Funcion que verifica si se topado el recuadro o se ha chocado con el mismo cuerpo
-bool perder(){
+//Funcion para eliminar la ultima parte del cuerpo de la serpiente 
+void borrarCuerpoSnake(int **cuerpoSerpiente, int n){
+	gotoxy(cuerpoSerpiente[n][0],cuerpoSerpiente[n][1]);printf(" ");
+}
+
+//Funcion que determina la direccion hacia la que se dirige la serpiente
+int direccionSnake(char inputTecla, int direccionActual){
+	if(kbhit()){//La funcion kbhit manda un 0 hasta que se registre un tecleo y entra al if
+		inputTecla = getch();//Entrada de la tecla
+		switch(inputTecla){//Asignamos la direccion que eligió el jugador
+		case ARRIBA : if(direccionActual != 2) return 1; break;
+		case ABAJO : if(direccionActual != 1) return 2; break;
+		case DERECHA : if(direccionActual != 4) return 3; break;
+		case IZQUIERDA : if(direccionActual != 3) return 4; break;
+		}
+	}
+	return direccionActual;//Si no entramos al if, regresamos la direccion que ya tenia el snake
+}
+
+//Funcion que imprime la presa o comida de la serpiente de forma aleatoria 
+void comidaSerpiente(int x, int y, int *px2, int *py2, int *pdimensionSnake, int *pPuntos){//Se usan punteros para poder cambiar directamente los valores
+	int x2 = *px2, y2 = *py2, dimensionSnake = *pdimensionSnake, puntos = *pPuntos;//Asignamos a las variables locales los valores de las variables de la funcion JuegosSnake
+	if((x == x2) && (y == y2)){//Si la posición del snake coincide con la posición de la comida	entramos a este if													
+		x2 = (rand() % 73) + 4;
+		y2 = (rand() % 18) + 5;//Buscamos una ubicación Random
+		dimensionSnake++;
+		puntos += 25;//Agregamos puntos al jugador
+		gotoxy(x2,y2);printf("%c", 254);//ponemos una comida nueva
+	}
+	*px2 = x2;
+	*py2 = y2;
+	*pdimensionSnake = dimensionSnake;
+	*pPuntos = puntos;//Regresamos a la memoria los nuevos valores que deben tomar las variables de la función JuegoSnake
+}
+
+//Funcion para determinar si la serpiente choca con el borde o consigo misma 
+bool choqueConBorde(int **cuerpoSerpiente, int x, int y, int dimensionSnake){
 	int j;
 	if((y == 4) || (y == 23) || (x == 2) || (x == 77)) 
 		return false;
- 	for(j = tam - 1; j > 0; j--){
-	 	if(cuerpo[j][0] == x && cuerpo[j][1] == y)
-	 	return false;
+	for(j = dimensionSnake - 1; j > 0; j--){
+		if(cuerpoSerpiente[j][0] == x && cuerpoSerpiente[j][1] == y)
+			return false;
 	}
 	return true;
 }
@@ -893,8 +920,14 @@ bool perder(){
 //Funcion que solicita el nombre al usuario para el juego de snake
 void solicitarNombreSnake(){
 	fflush(stdin);
-	gotoxy(46,10);printf("Inserte Su Nickname:");
-	gotoxy(66,10);gets(Jugador.nombre);
+	gotoxy(19,19);printf("INSERTE SU NICKNAME (max 6 caracteres): ");
+	gets(Jugador.nombre);
+}
+
+//Funcion que asigna los puntos al jugador de snake 
+void asignarPuntajeSnake(int puntos){
+	fflush(stdin);
+	Jugador.puntos = puntos;
 }
 
 //Funcion que guarda el registo de snake en un archivo txt
@@ -904,8 +937,8 @@ void guardarRegistroSnake(player Jugador){
 	if(f == NULL){
 		printf("No se pudo abrir el archivo.\n");
 	}else{
-		gotoxy(3,5);fprintf(f, "\n\t\t\t\t%s.........", Jugador.nombre); 
-		gotoxy(17,5);fprintf (f, "%d", Jugador.puntos);
+		gotoxy(3,2);fprintf(f, "\n\t\t\t\t%s.....", Jugador.nombre); 
+		gotoxy(17,2);fprintf (f, "%d", Jugador.puntos);
 	}
 	fclose(f);
 }
@@ -926,16 +959,10 @@ void consultarRegistroSnake(){
 	}
 }
 
-//Funcion que asigna los puntos al jugador de snake
-void asignarPuntajeSnake(int puntosJugador){
-	fflush(stdin);
-	Jugador.puntos = puntos;
-}
-
 //Funcion que oculta el cursor
-void ocultarCursor(){
-	CONSOLE_CURSOR_INFO cci = {100, FALSE};
-	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cci);
+void ocultarCursorSnake(){
+	CONSOLE_CURSOR_INFO cursor = {100, FALSE};
+	SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursor);
 }
 
 //Función principal del juego Ahorcado
@@ -982,7 +1009,6 @@ void juegoAhorcado(){
 					printf("%c ",inputRespuestas[i]);//Imprimimos los guiones bajos y las letras que haya encontrado
 				}
 				impresionPartesDelCuerpoAhorcado(errores);//Llamamos a la funcion para imprimir el dibujo del ahorcado
-				
 				gotoxy(40, 7); printf("JUGADOR 2");
 				gotoxy(40, 8); printf("Oportunidades: %i ", 10 - errores);
 				gotoxy(40, 11); printf("Introduzca una letra: "); scanf("%c",&answer);//Entrada de la respuesta
@@ -1074,20 +1100,19 @@ void impresionPartesDelCuerpoAhorcado(int e){
 		gotoxy(26, 16); printf("*"); gotoxy(27, 17); printf("*"); 
 		gotoxy(28, 18); printf("*"); gotoxy(29, 19);printf("*");
 		gotoxy(35, 9); printf("%c SE HAN TERMINADO TUS OPORTUNIDADES %c\n\n\n\n\n\n\n\n", 186, 186);
-		gotoxy(39, 11); printf("Presiona cualquier tecla");getch();
+		Sleep(2000);
 	}
-	
 }
 
 //Funcion para buscar si la respuesta del jugador es correcta en el ahorcado
 void buscadorDeCaracterAhorcado(char answer, char *frase, char *respuestas, int *errores, int longitud){
-	int i, e = *errores;//e guarda el valor que está en la direcciones de errores
+	int i, e = *errores;//Guarda el valor que está en la direcciones de errores
 	int yaExiste = 0, found = 0;//Banderas
 	
 	for(i = 0; i < longitud; i++){//Primero buscamos si esa letra ya fue introducida por el usuario antes
 		if(respuestas[i] == answer){
 			gotoxy(34, 15); printf("Esta letra ya ha sido introducida");
-			gotoxy(38, 16); printf("Presiona cualquier tecla");getch();
+			Sleep(1000);
 			yaExiste = 1;//Bandera para saber si ya fue introducido el caracter antes
 		}
 	}
@@ -1098,12 +1123,12 @@ void buscadorDeCaracterAhorcado(char answer, char *frase, char *respuestas, int 
 				respuestas[i] = answer;
 				found = 1;//Bandera para saber que la respuesta es correcta
 				gotoxy(41, 15); printf("Respuesta correcta");
-				gotoxy(38, 16); printf("Presiona cualquier tecla");getch();
+				Sleep(1000);
 			}
 		}
 		if(found == 0){//Si no se encontró la letra en la frase se entra a este if
 			gotoxy(40, 15); printf("Respuesta incorrecta");
-			gotoxy(38, 16); printf("Presiona cualquier tecla");getch();
+			Sleep(1000);
 			e++;
 			*errores = e;//Uso de puntero para modificar directamente el valor de errores
 		}
